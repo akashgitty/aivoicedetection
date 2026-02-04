@@ -1,10 +1,4 @@
-from fastapi import FastAPI, HTTPException, Header
-from pydantic import BaseModel
-import base64
-
-app = FastAPI()
-
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 import base64
 
@@ -12,7 +6,7 @@ app = FastAPI()
 
 API_KEY = "mysecretkey123"
 
-# 🔹 Updated request model (matches tester)
+
 class AudioRequest(BaseModel):
     language: str
     audioFormat: str
@@ -20,16 +14,14 @@ class AudioRequest(BaseModel):
 
 
 @app.post("/detect")
-async def detect_voice(
-    request: AudioRequest,
-    x_api_key: str = Header(None)
-):
-    # API key check
+async def detect_voice(request: AudioRequest, x_api_key: str = Header(None)):
+
+    # API Key Check
     if x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail="Invalid API Key")
 
     try:
-        # decode tester base64 field
+        # Decode base64 safely
         base64.b64decode(request.audioBase64)
 
         return {
@@ -38,4 +30,4 @@ async def detect_voice(
         }
 
     except Exception:
-        raise HTTPException(status_code=400, detail="Invalid audio data")
+        raise HTTPException(status_code=400, detail="Invalid audio")
